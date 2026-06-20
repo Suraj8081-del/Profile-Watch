@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Profile Watch — a free browser-based tool to document, risk-score, and report fake or impersonating social media profiles to law enforcement.">
+<meta name="theme-color" content="#1b2430">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='14' fill='%231b2430'/%3E%3Cpath d='M50 18 L78 30 V50 C78 68 66 80 50 86 C34 80 22 68 22 50 V30 Z' fill='%23a83232'/%3E%3C/svg%3E">
+<title>Profile Watch — Fake Profile Reporting Tool</title>
+<link rel="stylesheet" href="style (1).css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="brand">Cybercrime Cell · Citizen Reporting Desk</div>
+      <h1>Profile Watch</h1>
+    </div>
+    <div class="case-id" id="caseId">CASE REF: —</div>
+  </header>
+
+  <p class="lede">Document a suspected fake or impersonating social media profile. This tool checks the details you provide against common impersonation red flags, scores the risk, and prepares a clean report you can submit to your local cybercrime cell or platform's report system.</p>
+
+  <div class="panel">
+    <h2>01 — Profile details</h2>
+
+    <label for="platform">Platform</label>
+    <select id="platform">
+      <option>Instagram</option>
+      <option>Facebook</option>
+      <option>X (Twitter)</option>
+      <option>LinkedIn</option>
+      <option>WhatsApp</option>
+      <option>Telegram</option>
+      <option>Other</option>
+    </select>
+
+    <label for="profileUrl">Profile URL or username <span class="req">*</span></label>
+    <input type="text" id="profileUrl" placeholder="e.g. instagram.com/john_doe_official2 or @john_doe_official2">
+
+    <label for="impersonating">Who or what is it impersonating? <span class="req">*</span></label>
+    <input type="text" id="impersonating" placeholder="e.g. Real account of John Doe, or a bank/company name">
+
+    <label for="description">What happened — describe the issue <span class="req">*</span></label>
+    <textarea id="description" placeholder="e.g. This account is using my photos and name, messaging my contacts asking for money / This account is impersonating a bank and asking for OTP..."></textarea>
+
+    <label for="reporterContact">Your contact (optional, for your own records — not shared with anyone by this tool)</label>
+    <input type="text" id="reporterContact" placeholder="email or phone">
+
+    <div class="reverse-search-box">
+      <span class="hint" style="margin-top:0;">Suspect the profile photo is stolen? Run a reverse image search to find the original source:</span>
+      <div class="reverse-search-links">
+        <a href="https://images.google.com" target="_blank" rel="noopener">Google Images →</a>
+        <a href="https://tineye.com" target="_blank" rel="noopener">TinEye →</a>
+        <a href="https://www.bing.com/visualsearch" target="_blank" rel="noopener">Bing Visual Search →</a>
+      </div>
+      <span class="hint reverse-search-tip">Tip: save the profile photo to your device first, then upload it on any of these sites to search for matches.</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>02 — Red flags observed</h2>
+    <p class="hint" style="margin-top:0;">Tick everything you've noticed. These are common signals investigators look for in impersonation and scam profiles.</p>
+
+    <fieldset>
+      <legend>Account signals</legend>
+      <div class="flag-row"><input type="checkbox" class="flag" data-weight="15" data-label="Account created very recently"><span>Account looks newly created</span></div>
+      <div class="flag-row"><input type="checkbox" class="flag" data-weight="10" data-label="Very few followers/connections relative to claimed identity"><span>Very few followers/connections for who it claims to be</span></div>
+      <div class="flag-row"><input type="checkbox" class="flag" data-weight="10" data-label="Username has extra numbers/characters vs the real handle"><span>Username has odd numbers/characters (e.g. john_doe_official2)</span></div>
+      <div class="flag-row"><input type="checkbox" class="flag" data-weight="15" data-label="Profile photo appears copied/stolen from elsewhere"><span>Profile photo looks copied from another account/source</span></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Behavior signals</legend>
+      <div class="flag-row"><input type="checkbox" class="flag" data-weight="20" data-label="Asked for money, OTP, gift cards, or crypto"><span>Asked you (or others) for money, OTP, gift cards, or crypto</span></div>
+      <div class="flag-row"><input type="checkbox" class="flag" data-weight="15" data-label="Messaged contacts of the real person/brand"><span>Contacted friends/contacts of the real person or brand</span></div>
+      <div class="flag-row"><input type="checkbox" class="flag" data-weight="10" data-label="Created urgency or pressure tactics"><span>Used urgency/pressure tactics ("act now", "limited time")</span></div>
+      <div class="flag-row"><input type="checkbox" class="flag" data-weight="5" data-label="Poor grammar/spelling inconsistent with claimed identity"><span>Messages have odd grammar/spelling for who it claims to be</span></div>
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <button type="button" id="analyzeBtn">Analyze report</button>
+    <button type="button" id="resetBtn" class="secondary">Clear form</button>
+  </div>
+
+  <div class="risk-readout" id="riskReadout">
+    <div class="risk-meter">
+      <div class="risk-score" id="riskScore">0</div>
+      <div class="risk-label" id="riskLabel">—</div>
+    </div>
+    <p class="hint" id="riskSummary" style="margin-bottom:14px;"></p>
+    <ul class="signal-list" id="signalList"></ul>
+    <div class="actions">
+      <button type="button" id="downloadBtn">Download complaint report (.txt)</button>
+      <button type="button" id="saveCaseBtn" class="secondary">Save to case list</button>
+    </div>
+  </div>
+
+  <div class="panel" id="caseListPanel" style="display:none;">
+    <h2>03 — Case list (this session, saved in your browser)</h2>
+    <p class="hint" style="margin-top:0;">All profiles you've analyzed and saved. Stored only in this browser via local storage — not sent anywhere.</p>
+    <div class="table-scroll">
+      <table id="caseTable" class="case-table">
+        <thead>
+          <tr>
+            <th>Case ref</th>
+            <th>Platform</th>
+            <th>Profile</th>
+            <th>Risk</th>
+            <th>Saved</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="caseTableBody"></tbody>
+      </table>
+    </div>
+    <div class="actions">
+      <button type="button" id="downloadAllBtn" class="secondary">Download all cases (.txt)</button>
+      <button type="button" id="clearCasesBtn" class="secondary">Clear case list</button>
+    </div>
+  </div>
+
+  <footer>
+    PROFILE WATCH v1.0 — All processing happens locally in your browser. Nothing is sent anywhere. For genuine emergencies (active fraud, threats), also report at cybercrime.gov.in or your local police station.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
